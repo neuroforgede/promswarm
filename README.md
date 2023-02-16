@@ -1,6 +1,6 @@
 # promswarm
 
-Modernized version of [swarmprom](https://github.com/stefanprodan/swarmprom)
+Modernized version of [swarmprom](https://github.com/stefanprodan/swarmprom) packaged as a [nothelm](https://github.com/neuroforgede/nothelm.py/) chart.
 
 # How to use this repository
 
