@@ -46,6 +46,13 @@ promswarm_alertmanager_volume_config: {}
 EOF
 ```
 
+After you have verified everything looks good, you can deploy by running
+
+```bash
+cd $WORKDIR
+bash setup.sh
+```
+
 # Sample Screenshots
 
 Grafana:
