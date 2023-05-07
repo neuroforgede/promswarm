@@ -66,3 +66,21 @@ groups:
       description: Hetzner Cloud volume on {{ $labels.device }} attached to Swarm node {{ $labels.node_name }} disk is going to fill up in
         6h.
       summary: Disk fill alert for Swarm node '{{ $labels.node_name }}'
+
+  - alert: node_down
+    expr: rate(docker_swarm_node_total{docker_swarm_node_status_state!='ready'}[60s]) > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Node {{ $labels.docker_swarm_node_description_hostname }} seems to be down.
+      summary: Node {{ $labels.docker_swarm_node_description_hostname }} seems to be down.
+
+  - alert: manager_not_reachable
+    expr: rate(docker_swarm_node_total{docker_swarm_node_spec_role='manager', docker_swarm_node_managerstatus_reachability!="reachable"}[60s]) > 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      description: Manager {{ $labels.docker_swarm_node_description_hostname }} is not reachable.
+      summary: Manager {{ $labels.docker_swarm_node_description_hostname }} is not reachable.

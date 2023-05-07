@@ -52,6 +52,13 @@ scrape_configs:
       type: 'A'
       port: 9000
 
+  - job_name: 'docker-swarm-exporter'
+    dns_sd_configs:
+    - names:
+      - 'tasks.docker-swarm-exporter'
+      type: 'A'
+      port: 9000
+
   - job_name: prometheus-proxy
     dns_sd_configs:
     - names:
