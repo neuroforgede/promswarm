@@ -52,6 +52,13 @@ scrape_configs:
       - 'tasks.docker-engine-events-exporter'
       type: 'A'
       port: 9000
+      
+  - job_name: 'docker-engine-networks-exporter'
+    dns_sd_configs:
+    - names:
+      - 'tasks.docker-engine-networks-exporter'
+      type: 'A'
+      port: 9000
 
   - job_name: 'docker-swarm-exporter'
     dns_sd_configs:
