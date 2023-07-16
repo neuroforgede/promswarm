@@ -4,7 +4,7 @@ services:
   prometheus:
     user: root
     entrypoint: "/etc/prometheus/docker-entrypoint.sh"
-    image:  prom/prometheus:v2.36.0
+    image:  prom/prometheus:v2.41.0
     healthcheck:
       test: ["CMD", "wget", "--tries=1", "--spider", "--quiet", "http://localhost:9090/metrics"]
       interval: 10s
@@ -23,6 +23,8 @@ services:
     volumes:
       - prometheus:/prometheus
     configs:
+      - source: dns_rules
+        target: /etc/prometheus/service_dns.rules.yml
       - source: node_rules
         target: /etc/prometheus/swarm_node.rules.yml
       - source: task_rules
@@ -51,7 +53,7 @@ services:
         - traefik.http.routers.monitoring-prometheus-http.middlewares=monitoring-prometheus-auth
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.46.0
+    image: gcr.io/cadvisor/cadvisor:v0.47.0
     healthcheck:
       test: ["CMD", "wget", "--tries=1", "--spider", "--quiet", "http://localhost:8080/metrics"]
       interval: 10s
@@ -159,7 +161,7 @@ services:
 
   grafana:
     entrypoint: /custom_entrypoint.sh
-    image: grafana/grafana:9.1.6
+    image: grafana/grafana:9.3.6
     healthcheck:
       test: ["CMD", "wget", "--tries=1", "--spider", "--quiet", "http://localhost:3000/api/health"]
       interval: 10s
@@ -213,7 +215,7 @@ services:
         - traefik.http.services.monitoring-grafana.loadbalancer.server.port=3000
 
   alertmanager:
-    image: prom/alertmanager:v0.24.0
+    image: prom/alertmanager:v0.25.0
     healthcheck:
       test: ["CMD", "wget", "--tries=1", "--spider", "--quiet", "http://localhost:9093/metrics"]
       interval: 10s
@@ -273,7 +275,63 @@ services:
         reservations:
           memory: 64M
 
+  docker_socket_proxy:
+    image: tecnativa/docker-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - net
+    environment:
+      CONTAINERS: 1
+      SERVICES: 1
+      SWARM: 1
+      NODES: 1
+      NETWORKS: 1
+      TASKS: 1
+      VERSION: 1
+
+      AUTH: 1
+      SECRETS: 1
+      POST: 1
+      BUILD: 1
+      COMMIT: 1
+      CONFIGS: 1
+      DISTRIBUTION: 1
+      EXEC: 1
+      GRPC: 1
+      IMAGES: 1
+      INFO: 1
+      PLUGINS: 1
+      SESSION: 1
+      SYSTEM: 1
+      VOLUMES: 1
+    deploy:
+      mode: global
+
+  docker-service-dns-prometheus-exporter:
+    image: ghcr.io/neuroforgede/docker-service-dns-prometheus-exporter/dnscheck:0.1.19
+    environment:
+      - PROXY_SERVICE_NAME=monitoring_docker_socket_proxy
+      - DNS_CHECK_CONTAINER_IMAGE=ghcr.io/neuroforgede/docker-service-dns-prometheus-exporter/dnscheck:0.1.19
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    networks:
+      - net
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+      placement:
+        constraints:
+          - node.role==manager
+
 configs:
+  dns_rules:
+    file: ./configs/prometheus/rules/service_dns.rules.yml
   node_rules:
     file: ./configs/prometheus/rules/swarm_node.rules.yml
   task_rules:
