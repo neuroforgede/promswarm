@@ -1,9 +1,9 @@
-groups:
-- name: /1/store/projects/docker-swarm/apps/swarmprom/prometheus/rules/service_dns.rules.yml
-  rules:
-  - alert: Failed DNS lookup
-    expr: count by(source_service_id, source_service_name, target_service_name, target_service_id, target_service_network_id, source_container_id) (
-        docker_service_dns_resolution_success == 0
-      )
-    annotations:
-      summary: "Failed DNS lookup from {{ $labels.source_service_name }} to {{ $labels.target_service_name }} in network {{ $labels.target_service_network_id }} (container: {{ $labels.source_container_id }})"
+# groups:
+# - name: /1/store/projects/docker-swarm/apps/swarmprom/prometheus/rules/service_dns.rules.yml
+#   rules:
+#   - alert: Failed DNS lookup
+#     expr: count by(source_service_id, source_service_name, target_service_name, target_service_id, target_service_network_id, source_container_id) (
+#         docker_service_dns_resolution_success == 0
+#       )
+#     annotations:
+#       summary: "Failed DNS lookup from {{ $labels.source_service_name }} to {{ $labels.target_service_name }} in network {{ $labels.target_service_network_id }} (container: {{ $labels.source_container_id }})"
